@@ -1,10 +1,10 @@
 package eu.kanade.tachiyomi.core.security
 
 import eu.kanade.tachiyomi.util.lang.Hash
-import java.security.SecureRandom
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.security.SecureRandom
 
 object ParentalStateManager {
 
