@@ -84,6 +84,7 @@ object HomeScreen : Screen() {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val context = LocalContext.current
         TabNavigator(
             tab = LibraryTab,
             key = TabNavigatorKey,
@@ -155,7 +156,7 @@ object HomeScreen : Screen() {
                             Tab.Updates -> UpdatesTab
                             Tab.History -> HistoryTab
                             is Tab.Browse -> {
-                                val securityPreferences = appGraph.securityPreferences
+                                val securityPreferences = context.appGraph.securityPreferences
                                 if (!ParentalStateManager.isParentMode(securityPreferences)) {
                                     LibraryTab
                                 } else {
