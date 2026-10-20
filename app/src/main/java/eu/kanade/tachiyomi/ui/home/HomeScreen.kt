@@ -190,7 +190,8 @@ object HomeScreen : Screen() {
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
         val securityPreferences = remember { context.appGraph.securityPreferences }
-        val isParentalEnabled = remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
+        val isParentalEnabled =
+            remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
         val isParentMode by ParentalStateManager.isParentModeActive.collectAsState()
         var showPinDialog by remember { mutableStateOf(false) }
 

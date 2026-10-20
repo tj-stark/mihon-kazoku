@@ -26,7 +26,8 @@ class SecurityPreferences(
 
     val hideNotificationContent: Preference<Boolean> = preferenceStore.getBoolean("hide_notification_content", false)
 
-    val parentalControlsEnabled: Preference<Boolean> = preferenceStore.getBoolean("parental_controls_enabled", false)
+    val parentalControlsEnabled: Preference<Boolean> =
+        preferenceStore.getBoolean("parental_controls_enabled", false)
 
     val parentalPinHash: Preference<String> = preferenceStore.getString("parental_pin_hash", "")
 

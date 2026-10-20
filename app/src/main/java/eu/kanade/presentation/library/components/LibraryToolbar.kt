@@ -108,7 +108,8 @@ private fun LibraryRegularToolbar(
             val filterTint = if (hasFilters) MaterialTheme.colorScheme.active else LocalContentColor.current
             val context = LocalContext.current
             val securityPreferences = remember { context.appGraph.securityPreferences }
-            val isParentalEnabled = remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
+            val isParentalEnabled =
+                remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
             val isParentMode by ParentalStateManager.isParentModeActive.collectAsState()
             var showPinDialog by remember { mutableStateOf(false) }
 
@@ -132,7 +133,11 @@ private fun LibraryRegularToolbar(
                                         MR.strings.parental_mode_locked
                                     },
                                 ),
-                                icon = if (isParentMode) MaterialSymbols.Rounded.LockOpen else MaterialSymbols.Rounded.Lock,
+                                icon = if (isParentMode) {
+                                    MaterialSymbols.Rounded.LockOpen
+                                } else {
+                                    MaterialSymbols.Rounded.Lock
+                                },
                                 onClick = {
                                     if (isParentMode) {
                                         ParentalStateManager.lock()
