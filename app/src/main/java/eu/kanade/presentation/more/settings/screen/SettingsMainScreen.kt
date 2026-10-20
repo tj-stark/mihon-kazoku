@@ -14,12 +14,16 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -28,10 +32,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.StringResource
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.AppBarActions
+import eu.kanade.presentation.components.ParentPinDialog
+import eu.kanade.presentation.components.ParentPinDialogMode
 import eu.kanade.presentation.more.settings.screen.about.AboutScreen
 import eu.kanade.presentation.more.settings.widget.TextPreferenceWidget
 import eu.kanade.presentation.util.LocalBackPress
 import eu.kanade.presentation.util.Screen
+import eu.kanade.tachiyomi.core.security.ParentalStateManager
+import mihon.app.di.appGraph
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.automirroredrounded.ChromeReaderMode
 import mihon.icons.materialsymbols.rounded.Code
@@ -47,6 +55,7 @@ import mihon.icons.materialsymbols.rounded.Sync
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.i18n.stringResource
+import tachiyomi.presentation.core.util.collectAsState
 import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
 
 object SettingsMainScreen : Screen() {
@@ -78,6 +87,25 @@ object SettingsMainScreen : Screen() {
         val backPress = LocalBackPress.currentOrThrow
         val containerColor = if (twoPane) getPalerSurface() else MaterialTheme.colorScheme.surface
         val topBarState = rememberTopAppBarState()
+        val context = LocalContext.current
+        val securityPreferences = remember { context.appGraph.securityPreferences }
+        val isParentalEnabled = remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
+        val isParentMode by ParentalStateManager.isParentModeActive.collectAsState()
+        var pendingScreen by remember { mutableStateOf<VoyagerScreen?>(null) }
+
+        if (pendingScreen != null) {
+            ParentPinDialog(
+                mode = ParentPinDialogMode.UNLOCK,
+                onDismissRequest = { pendingScreen = null },
+                onSuccess = {
+                    val target = pendingScreen
+                    pendingScreen = null
+                    if (target != null) {
+                        navigator.navigate(target, twoPane)
+                    }
+                },
+            )
+        }
 
         Scaffold(
             topBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState),
@@ -91,7 +119,13 @@ object SettingsMainScreen : Screen() {
                                 AppBar.Action(
                                     title = stringResource(MR.strings.action_search),
                                     icon = MaterialSymbols.Rounded.Search,
-                                    onClick = { navigator.navigate(SettingsSearchScreen(), twoPane) },
+                                    onClick = {
+                                        if (isParentalEnabled && !isParentMode) {
+                                            pendingScreen = SettingsSearchScreen()
+                                        } else {
+                                            navigator.navigate(SettingsSearchScreen(), twoPane)
+                                        }
+                                    },
                                 ),
                             ),
                         )
@@ -149,7 +183,17 @@ object SettingsMainScreen : Screen() {
                                 title = stringResource(item.titleRes),
                                 subtitle = item.formatSubtitle(),
                                 icon = item.icon,
-                                onPreferenceClick = { navigator.navigate(item.screen, twoPane) },
+                                onPreferenceClick = {
+                                    val isSensitive = item.screen is SettingsBrowseScreen ||
+                                        item.screen is SettingsDataScreen ||
+                                        item.screen is SettingsSecurityScreen ||
+                                        item.screen is SettingsAdvancedScreen
+                                    if (isSensitive && isParentalEnabled && !isParentMode) {
+                                        pendingScreen = item.screen
+                                    } else {
+                                        navigator.navigate(item.screen, twoPane)
+                                    }
+                                },
                             )
                         }
                     }

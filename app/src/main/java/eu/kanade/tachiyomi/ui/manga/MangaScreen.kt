@@ -37,6 +37,7 @@ import eu.kanade.presentation.manga.components.SetIntervalDialog
 import eu.kanade.presentation.util.AssistContentScreen
 import eu.kanade.presentation.util.Screen
 import eu.kanade.presentation.util.isTabletUi
+import eu.kanade.tachiyomi.core.security.ParentalStateManager
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.isLocalOrStub
 import eu.kanade.tachiyomi.source.online.HttpSource
@@ -48,6 +49,7 @@ import eu.kanade.tachiyomi.ui.manga.notes.MangaNotesScreen
 import eu.kanade.tachiyomi.ui.manga.track.TrackInfoDialogHomeScreen
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.setting.SettingsScreen
+import mihon.app.di.appGraph
 import eu.kanade.tachiyomi.ui.webview.WebViewScreen
 import eu.kanade.tachiyomi.util.system.copyToClipboard
 import eu.kanade.tachiyomi.util.system.toShareIntent
@@ -92,6 +94,8 @@ class MangaScreen(
 
         val successState = state as MangaViewModel.State.Success
         val isHttpSource = remember { successState.source is HttpSource }
+        val securityPreferences = remember { context.appGraph.securityPreferences }
+        val isParentMode = remember(securityPreferences) { ParentalStateManager.isParentMode(securityPreferences) }
 
         LaunchedEffect(successState.manga, viewModel.source) {
             if (isHttpSource) {
@@ -130,14 +134,14 @@ class MangaScreen(
                     viewModel.manga,
                     viewModel.source,
                 )
-            }.takeIf { isHttpSource },
+            }.takeIf { isHttpSource && isParentMode },
             onWebViewLongClicked = {
                 copyMangaUrl(
                     context,
                     viewModel.manga,
                     viewModel.source,
                 )
-            }.takeIf { isHttpSource },
+            }.takeIf { isHttpSource && isParentMode },
             onTrackingClicked = {
                 if (!successState.hasLoggedInTrackers) {
                     navigator.push(SettingsScreen(SettingsScreen.Destination.Tracking))

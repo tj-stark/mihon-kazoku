@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mihon</string>
+    <string name="app_name" translatable="false">Mihon Kazoku</string>
+
+    <!-- Parental Controls -->
+    <string name="parental_controls">Parental controls</string>
+    <string name="parental_controls_summary">Lock browsing, external sources, and sensitive settings behind a PIN</string>
+    <string name="parental_lock_mode">Parent Mode</string>
+    <string name="parental_child_mode">Child Mode</string>
+    <string name="parental_mode_unlocked">Parent Mode unlocked</string>
+    <string name="parental_mode_locked">Parent Mode locked</string>
+    <string name="parental_enter_pin">Enter Parent PIN</string>
+    <string name="parental_set_pin">Set Parent PIN</string>
+    <string name="parental_change_pin">Change Parent PIN</string>
+    <string name="parental_confirm_pin">Confirm Parent PIN</string>
+    <string name="parental_pin_incorrect">Incorrect PIN</string>
+    <string name="parental_pin_mismatch">PINs do not match</string>
+    <string name="parental_pin_set_success">Parent PIN set successfully</string>
+    <string name="parental_session_timeout">Lock Parent Mode after</string>
+    <string name="parental_session_timeout_summary">Automatically revert to Child Mode when idle</string>
+    <string name="parental_locked_explanation">This section is protected by Parental Controls. Enter your PIN to continue.</string>
 
     <!-- Generic strings -->
     <string name="on">On</string>

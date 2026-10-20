@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 env:
   MIHON_GITHUB_RELEASE: true
@@ -13,7 +14,7 @@ concurrency:
 
 jobs:
   get_tag:
-    if: github.repository == 'mihonapp/mihon'
+    if: github.repository == 'mihonapp/mihon' || github.repository == 'tj-stark/mihon-kazoku'
     name: Extract tag name
     runs-on: 'ubuntu-26.04'
     outputs:
@@ -25,7 +26,7 @@ jobs:
         run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
   build:
-    if: github.repository == 'mihonapp/mihon'
+    if: github.repository == 'mihonapp/mihon' || github.repository == 'tj-stark/mihon-kazoku'
     name: Build
     runs-on: 'ubuntu-26.04'
     needs: get_tag

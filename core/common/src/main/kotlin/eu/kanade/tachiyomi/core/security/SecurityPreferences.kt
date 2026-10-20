@@ -26,6 +26,14 @@ class SecurityPreferences(
 
     val hideNotificationContent: Preference<Boolean> = preferenceStore.getBoolean("hide_notification_content", false)
 
+    val parentalControlsEnabled: Preference<Boolean> = preferenceStore.getBoolean("parental_controls_enabled", false)
+
+    val parentalPinHash: Preference<String> = preferenceStore.getString("parental_pin_hash", "")
+
+    val parentalPinSalt: Preference<String> = preferenceStore.getString("parental_pin_salt", "")
+
+    val parentalSessionTimeout: Preference<Int> = preferenceStore.getInt("parental_session_timeout", 5)
+
     /**
      * For app lock. Will be set when there is a pending timed lock.
      * Otherwise, this pref should be deleted.

@@ -35,6 +35,9 @@ interface SecureActivityDelegate {
 
         fun onApplicationStopped(context: Context) {
             val preferences = context.appGraph.securityPreferences
+            if (preferences.parentalSessionTimeout.get() <= 0) {
+                eu.kanade.tachiyomi.core.security.ParentalStateManager.lock()
+            }
             if (!preferences.useAuthenticator.get()) return
 
             if (!AuthenticatorUtil.isAuthenticating) {
@@ -52,6 +55,7 @@ interface SecureActivityDelegate {
          */
         fun onApplicationStart(context: Context) {
             val preferences = context.appGraph.securityPreferences
+            eu.kanade.tachiyomi.core.security.ParentalStateManager.checkTimeout(preferences)
             if (!preferences.useAuthenticator.get()) return
 
             val lastClosedPref = preferences.lastAppClosed
@@ -93,6 +97,7 @@ class SecureActivityDelegateImpl : SecureActivityDelegate, DefaultLifecycleObser
     }
 
     override fun onResume(owner: LifecycleOwner) {
+        eu.kanade.tachiyomi.core.security.ParentalStateManager.checkTimeout(securityPreferences)
         setAppLock()
     }
 

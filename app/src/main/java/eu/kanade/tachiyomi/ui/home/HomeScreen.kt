@@ -18,9 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -31,8 +35,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import eu.kanade.presentation.components.ParentPinDialog
+import eu.kanade.presentation.components.ParentPinDialogMode
 import eu.kanade.presentation.util.Screen
 import eu.kanade.presentation.util.isTabletUi
+import eu.kanade.tachiyomi.core.security.ParentalStateManager
 import eu.kanade.tachiyomi.ui.browse.BrowseTab
 import eu.kanade.tachiyomi.ui.download.DownloadQueueScreen
 import eu.kanade.tachiyomi.ui.history.HistoryTab
@@ -46,10 +53,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mihon.app.di.appGraph
+import mihon.icons.materialsymbols.MaterialSymbols
+import mihon.icons.materialsymbols.rounded.Lock
 import soup.compose.material.motion.animation.materialFadeThroughIn
 import soup.compose.material.motion.animation.materialFadeThroughOut
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.pluralStringResource
+import tachiyomi.presentation.core.util.collectAsState
 
 object HomeScreen : Screen() {
 
@@ -145,10 +155,15 @@ object HomeScreen : Screen() {
                             Tab.Updates -> UpdatesTab
                             Tab.History -> HistoryTab
                             is Tab.Browse -> {
-                                if (it.toExtensions) {
-                                    BrowseTab.showExtension()
+                                val securityPreferences = appGraph.securityPreferences
+                                if (!ParentalStateManager.isParentMode(securityPreferences)) {
+                                    LibraryTab
+                                } else {
+                                    if (it.toExtensions) {
+                                        BrowseTab.showExtension()
+                                    }
+                                    BrowseTab
                                 }
-                                BrowseTab
                             }
                             is Tab.More -> MoreTab
                         }
@@ -173,12 +188,31 @@ object HomeScreen : Screen() {
         val tabNavigator = LocalTabNavigator.current
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+        val securityPreferences = remember { context.appGraph.securityPreferences }
+        val isParentalEnabled = remember(securityPreferences) { ParentalStateManager.isEnabled(securityPreferences) }
+        val isParentMode by ParentalStateManager.isParentModeActive.collectAsState()
+        var showPinDialog by remember { mutableStateOf(false) }
+
+        if (showPinDialog) {
+            ParentPinDialog(
+                mode = ParentPinDialogMode.UNLOCK,
+                onDismissRequest = { showPinDialog = false },
+                onSuccess = {
+                    showPinDialog = false
+                    tabNavigator.current = tab
+                },
+            )
+        }
+
         val selected = tabNavigator.current::class == tab::class
         NavigationSuiteItem(
             navigationSuiteType = navigationSuiteType,
             selected = selected,
             onClick = {
-                if (!selected) {
+                if (tab == BrowseTab && isParentalEnabled && !isParentMode) {
+                    showPinDialog = true
+                } else if (!selected) {
                     tabNavigator.current = tab
                 } else {
                     scope.launch { tab.onReselect(navigator) }
@@ -186,7 +220,11 @@ object HomeScreen : Screen() {
             },
             icon = {
                 Icon(
-                    painter = tab.options.icon!!,
+                    painter = if (tab == BrowseTab && isParentalEnabled && !isParentMode) {
+                        rememberVectorPainter(MaterialSymbols.Rounded.Lock)
+                    } else {
+                        tab.options.icon!!
+                    },
                     contentDescription = tab.options.title,
                 )
             },
