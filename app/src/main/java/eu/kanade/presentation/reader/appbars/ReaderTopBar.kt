@@ -55,7 +55,8 @@ fun ReaderTopBar(
                     )
                     val context = LocalContext.current
                     val securityPreferences = remember { context.appGraph.securityPreferences }
-                    val isParentMode = remember(securityPreferences) { ParentalStateManager.isParentMode(securityPreferences) }
+                    val isParentMode =
+                        remember(securityPreferences) { ParentalStateManager.isParentMode(securityPreferences) }
 
                     if (isParentMode) {
                         onOpenInWebView?.let {
