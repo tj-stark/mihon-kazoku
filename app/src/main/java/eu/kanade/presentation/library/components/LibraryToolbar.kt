@@ -126,7 +126,11 @@ private fun LibraryRegularToolbar(
                         add(
                             AppBar.Action(
                                 title = stringResource(
-                                    if (isParentMode) MR.strings.parental_mode_unlocked else MR.strings.parental_mode_locked,
+                                    if (isParentMode) {
+                                        MR.strings.parental_mode_unlocked
+                                    } else {
+                                        MR.strings.parental_mode_locked
+                                    },
                                 ),
                                 icon = if (isParentMode) MaterialSymbols.Rounded.LockOpen else MaterialSymbols.Rounded.Lock,
                                 onClick = {
