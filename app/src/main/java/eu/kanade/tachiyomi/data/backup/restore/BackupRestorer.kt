@@ -5,6 +5,8 @@ import android.net.Uri
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import eu.kanade.tachiyomi.core.security.ParentalStateManager
+import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.data.backup.BackupDecoder
 import eu.kanade.tachiyomi.data.backup.BackupNotifier
 import eu.kanade.tachiyomi.data.backup.models.BackupCategory
@@ -59,6 +61,7 @@ class BackupRestorer(
     private val backupDecoder: BackupDecoder,
     private val sourceManager: SourceManager,
     private val stubSourceRepository: StubSourceRepository,
+    private val securityPreferences: SecurityPreferences,
 ) {
 
     @AssistedFactory
@@ -93,6 +96,10 @@ class BackupRestorer(
 
         val logFile = writeErrorLog()
 
+        if (ParentalStateManager.isEnabled(securityPreferences)) {
+            ParentalStateManager.lock()
+        }
+
         notifier.showRestoreComplete(
             time,
             errors.size,
@@ -108,6 +115,17 @@ class BackupRestorer(
         // Store source mapping for error messages
         val backupMaps = backup.backupSources
         sourceMapping = backupMaps.associate { it.sourceId to it.name }
+
+        // Atomic re-lock: if backup contains parental controls, enforce them immediately
+        backup.backupParentalControls?.let { parental ->
+            if (parental.enabled && parental.pinHash.isNotBlank()) {
+                securityPreferences.parentalPinHash.set(parental.pinHash)
+                securityPreferences.parentalPinSalt.set(parental.pinSalt)
+                securityPreferences.parentalSessionTimeout.set(parental.sessionTimeout)
+                securityPreferences.parentalControlsEnabled.set(true)
+                ParentalStateManager.lock()
+            }
+        }
 
         if (options.libraryEntries) {
             restoreSourceNames(backupMaps)

@@ -107,6 +107,20 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.tachibk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.tachibk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.tachibk" />
+                <data android:pathPattern=".*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.mihonbk" />
+                <data android:pathPattern=".*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\..*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kazokubk" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kazokubk" />
             </intent-filter>
 
             <!--suppress AndroidDomInspection -->

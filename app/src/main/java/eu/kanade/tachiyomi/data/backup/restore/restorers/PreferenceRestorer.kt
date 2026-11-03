@@ -59,7 +59,14 @@ class PreferenceRestorer(
         val categoriesByName = allCategories.associateBy { it.name }
         val backupCategoriesById = backupCategories?.associateBy { it.id.toString() }.orEmpty()
         val prefs = preferenceStore.getAll()
+        val protectedParentalKeys = setOf(
+            "parental_controls_enabled",
+            "parental_pin_hash",
+            "parental_pin_salt",
+            "parental_session_timeout",
+        )
         toRestore.forEach { (key, value) ->
+            if (key in protectedParentalKeys) return@forEach
             try {
                 when (value) {
                     is IntPreferenceValue -> {

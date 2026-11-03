@@ -12,4 +12,14 @@ data class Backup(
     @ProtoNumber(104) var backupPreferences: List<BackupPreference> = emptyList(),
     @ProtoNumber(105) var backupSourcePreferences: List<BackupSourcePreferences> = emptyList(),
     @ProtoNumber(106) var backupExtensionStores: List<BackupExtensionStore> = emptyList(),
+    @ProtoNumber(107) var backupParentalControls: BackupParentalControls? = null,
+)
+
+@Serializable
+data class BackupParentalControls(
+    @ProtoNumber(1) val enabled: Boolean = false,
+    @ProtoNumber(2) val pinHash: String = "",
+    @ProtoNumber(3) val pinSalt: String = "",
+    @ProtoNumber(4) val sessionTimeout: Int = 5,
+    @ProtoNumber(5) val version: Int = 1,
 )

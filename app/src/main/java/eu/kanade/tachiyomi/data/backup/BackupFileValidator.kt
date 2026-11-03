@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.data.backup
 
 import android.net.Uri
 import dev.zacsweers.metro.Inject
+import eu.kanade.tachiyomi.data.backup.models.BackupParentalControls
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import kotlinx.coroutines.CancellationException
 import tachiyomi.domain.source.service.SourceManager
@@ -51,11 +52,12 @@ class BackupFileValidator(
             .map { it.name }
             .sorted()
 
-        return Results(missingSources, missingTrackers)
+        return Results(missingSources, missingTrackers, backup.backupParentalControls)
     }
 
     data class Results(
         val missingSources: List<String>,
         val missingTrackers: List<String>,
+        val parentalControls: BackupParentalControls? = null,
     )
 }

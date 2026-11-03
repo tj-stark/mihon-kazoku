@@ -38,6 +38,7 @@ fun ParentPinDialog(
     mode: ParentPinDialogMode,
     onDismissRequest: () -> Unit,
     onSuccess: () -> Unit,
+    customVerifier: ((String) -> Boolean)? = null,
 ) {
     val context = LocalContext.current
     val securityPreferences: SecurityPreferences = remember { context.appGraph.securityPreferences }
@@ -52,7 +53,12 @@ fun ParentPinDialog(
     val onConfirm = {
         when (mode) {
             ParentPinDialogMode.UNLOCK -> {
-                if (ParentalStateManager.unlockWithPin(pin, securityPreferences)) {
+                val success = if (customVerifier != null) {
+                    customVerifier(pin)
+                } else {
+                    ParentalStateManager.unlockWithPin(pin, securityPreferences)
+                }
+                if (success) {
                     onSuccess()
                     onDismissRequest()
                 } else {

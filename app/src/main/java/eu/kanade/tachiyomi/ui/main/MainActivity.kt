@@ -642,9 +642,14 @@ class MainActivity : BaseActivity() {
             }
             Intent.ACTION_VIEW -> {
                 // Handling opening of backup files
-                if (intent.data.toString().endsWith(".tachibk")) {
+                val uriString = intent.data.toString()
+                if (uriString.endsWith(".tachibk") ||
+                    uriString.endsWith(".mihonbk") ||
+                    uriString.endsWith(".kazokubk") ||
+                    uriString.endsWith(".proto.gz")
+                ) {
                     navigator.popUntilRoot()
-                    navigator.push(RestoreBackupScreen(intent.data.toString()))
+                    navigator.push(RestoreBackupScreen(uriString))
                 }
                 // Deep link to add extension store
                 else if (intent.isAddExtensionStoreIntent()) {

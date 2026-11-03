@@ -23,6 +23,11 @@ object ParentalStateManager {
         return !isEnabled(preferences) || _isParentModeActive.value
     }
 
+    fun verifyPin(pin: String, salt: String, expectedHash: String): Boolean {
+        val computedHash = Hash.sha256(salt + pin)
+        return computedHash.equals(expectedHash, ignoreCase = true)
+    }
+
     fun unlockWithPin(pin: String, preferences: SecurityPreferences): Boolean {
         if (!isEnabled(preferences)) {
             _isParentModeActive.value = true
@@ -32,9 +37,8 @@ object ParentalStateManager {
 
         val salt = preferences.parentalPinSalt.get()
         val storedHash = preferences.parentalPinHash.get()
-        val computedHash = Hash.sha256(salt + pin)
 
-        if (computedHash.equals(storedHash, ignoreCase = true)) {
+        if (verifyPin(pin, salt, storedHash)) {
             _isParentModeActive.value = true
             unlockedAtTimestamp = System.currentTimeMillis()
             return true

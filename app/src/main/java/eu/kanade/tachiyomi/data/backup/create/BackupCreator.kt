@@ -15,7 +15,9 @@ import eu.kanade.tachiyomi.data.backup.create.creators.MangaBackupCreator
 import eu.kanade.tachiyomi.data.backup.create.creators.PreferenceBackupCreator
 import eu.kanade.tachiyomi.data.backup.create.creators.SourcesBackupCreator
 import eu.kanade.tachiyomi.data.backup.models.Backup
-import eu.kanade.tachiyomi.data.backup.models.BackupCategory
+import eu.kanade.tachiyomi.core.security.ParentalStateManager
+import eu.kanade.tachiyomi.core.security.SecurityPreferences
+import eu.kanade.tachiyomi.data.backup.models.BackupParentalControls
 import eu.kanade.tachiyomi.data.backup.models.BackupExtensionStore
 import eu.kanade.tachiyomi.data.backup.models.BackupManga
 import eu.kanade.tachiyomi.data.backup.models.BackupPreference
@@ -55,6 +57,7 @@ class BackupCreator(
     private val extensionStoresBackupCreator: ExtensionStoresBackupCreator,
     private val sourcesBackupCreator: SourcesBackupCreator,
     private val backupFileValidator: BackupFileValidator,
+    private val securityPreferences: SecurityPreferences,
 ) {
     @AssistedFactory
     fun interface Factory {
@@ -108,6 +111,7 @@ class BackupCreator(
                             backupPreferences = backupAppPreferences(options),
                             backupExtensionStores = backupExtensionStores(options),
                             backupSourcePreferences = backupSourcePreferences(options),
+                            backupParentalControls = backupParentalControls(),
                         ),
                     )
                     if (writer.isEmpty) {
@@ -165,13 +169,24 @@ class BackupCreator(
         return preferenceBackupCreator.createSource(includePrivatePreferences = options.privateSettings)
     }
 
+    private fun backupParentalControls(): BackupParentalControls? {
+        if (!ParentalStateManager.isEnabled(securityPreferences)) return null
+        return BackupParentalControls(
+            enabled = true,
+            pinHash = securityPreferences.parentalPinHash.get(),
+            pinSalt = securityPreferences.parentalPinSalt.get(),
+            sessionTimeout = securityPreferences.parentalSessionTimeout.get(),
+        )
+    }
+
     companion object {
         private const val MAX_AUTO_BACKUPS: Int = 4
-        private val FILENAME_REGEX = """${BuildConfig.APPLICATION_ID}_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.tachibk""".toRegex()
+        private val FILENAME_REGEX =
+            """${BuildConfig.APPLICATION_ID}_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.(tachibk|mihonbk|kazokubk)""".toRegex()
 
         fun getFilename(): String {
             val date = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.ENGLISH).format(Date())
-            return "${BuildConfig.APPLICATION_ID}_$date.tachibk"
+            return "${BuildConfig.APPLICATION_ID}_$date.mihonbk"
         }
     }
 }
