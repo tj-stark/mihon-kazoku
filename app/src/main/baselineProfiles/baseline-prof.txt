@@ -29182,6 +29182,9 @@ HSPLmihon/core/migration/migrations/SetupBackupCreateMigration;-><init>(Landroid
 Lmihon/core/migration/migrations/SetupLibraryUpdateMigration;
 HSPLmihon/core/migration/migrations/SetupLibraryUpdateMigration;-><clinit>()V
 HSPLmihon/core/migration/migrations/SetupLibraryUpdateMigration;-><init>(Landroid/content/Context;)V
+Lmihon/core/migration/migrations/SetupDefaultExtensionRepoMigration;
+HSPLmihon/core/migration/migrations/SetupDefaultExtensionRepoMigration;-><clinit>()V
+HSPLmihon/core/migration/migrations/SetupDefaultExtensionRepoMigration;-><init>(Leu/kanade/domain/source/service/SourcePreferences;Lmihon/domain/extension/repository/ExtensionStoreRepository;)V
 Lmihon/core/migration/migrations/TrustExtensionRepositoryMigration;
 HSPLmihon/core/migration/migrations/TrustExtensionRepositoryMigration;-><clinit>()V
 HSPLmihon/core/migration/migrations/TrustExtensionRepositoryMigration;-><init>(Leu/kanade/domain/source/service/SourcePreferences;Lmihon/domain/extension/repository/ExtensionStoreRepository;)V
