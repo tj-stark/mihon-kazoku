@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mihon.domain.extension.util.ExplicitSourceFilter
 import mihon.domain.manga.model.toDomainManga
 import tachiyomi.core.common.preference.toggle
 import tachiyomi.domain.manga.interactor.GetManga
@@ -87,8 +88,10 @@ abstract class SearchViewModel(
     }
 
     open suspend fun getEnabledSources(): List<Source> {
+        val filterExplicit = preferences.filterExplicitNamedSources.get()
         return sourceManager.getAll()
             .filter { (it.lang in enabledLanguages || it.isLocal()) && "${it.id}" !in disabledSources }
+            .filterNot { filterExplicit && !it.isLocal() && ExplicitSourceFilter.isExplicit(it.name) }
             .sortedWith(
                 compareBy(
                     { "${it.id}" !in pinnedSources },

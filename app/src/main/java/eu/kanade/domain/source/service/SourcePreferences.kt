@@ -48,6 +48,11 @@ class SourcePreferences(
         setOf(ContentWarning.SAFE, ContentWarning.MIXED, ContentWarning.NSFW),
     )
 
+    val filterExplicitNamedSources: Preference<Boolean> = preferenceStore.getBoolean(
+        "filter_explicit_named_sources",
+        true,
+    )
+
     val applyContentWarningsToInstalled: Preference<Boolean> = preferenceStore.getBoolean(
         "apply_content_warnings_to_installed",
         true,

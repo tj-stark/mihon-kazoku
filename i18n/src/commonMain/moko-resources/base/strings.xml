@@ -294,6 +294,8 @@
     <string name="firebase_summary">Sending crash logs and analytics will allow us to identify and fix issues, improve performance, and make future updates more relevant to your needs</string>
 
     <string name="pref_category_extensions">Extensions</string>
+    <string name="pref_filter_explicit_named_sources">Filter explicit-named sources</string>
+    <string name="pref_filter_explicit_named_sources_summary">Hides dedicated adult sources containing terms like hentai, porn, coomer, etc., while keeping general manga sources accessible</string>
     <string name="pref_allowed_content_warnings">Allowed content warnings</string>
     <string name="pref_apply_content_warnings_to_installed">Also apply to installed extensions</string>
     <string name="pref_apply_content_warnings_to_installed_summary">When off, extensions you already installed keep loading and updating regardless of their warning</string>

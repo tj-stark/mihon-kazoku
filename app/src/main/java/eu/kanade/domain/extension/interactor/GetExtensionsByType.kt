@@ -7,6 +7,7 @@ import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.extension.model.Extension
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import mihon.domain.extension.util.ExplicitSourceFilter
 
 @Inject
 class GetExtensionsByType(
@@ -19,25 +20,29 @@ class GetExtensionsByType(
 
         return combine(
             preferences.enabledLanguages.changes(),
+            preferences.filterExplicitNamedSources.changes(),
             extensionManager.loadedExtensionsFlow,
             extensionManager.notLoadedExtensionsFlow,
             extensionManager.availableExtensionsFlow,
-        ) { enabledLanguages, _loaded, _notLoaded, _available ->
+        ) { enabledLanguages, filterExplicit, _loaded, _notLoaded, _available ->
             val byName = compareBy<Extension, String>(String.CASE_INSENSITIVE_ORDER) { it.name }
 
             val (loadedUpdates, loaded) = _loaded.partition { it.hasUpdate }
             val (notLoadedUpdates, notLoaded) = _notLoaded.partition { it.hasUpdate }
 
-            val updates = (loadedUpdates + notLoadedUpdates).sortedWith(byName)
+            val updates = (loadedUpdates + notLoadedUpdates)
+                .filterNot { filterExplicit && ExplicitSourceFilter.isExplicit(it.name, it.pkgName) }
+                .sortedWith(byName)
 
             val installedSignatures = (_loaded + _notLoaded).groupBy({ it.pkgName }, { it.signatures })
             val available = _available
                 .filter { extension ->
                     installedSignatures[extension.pkgName].orEmpty().none { extension.store.signingKey in it } &&
-                        extension.contentWarning in enabledContentWarnings
+                        extension.contentWarning in enabledContentWarnings &&
+                        (!filterExplicit || !ExplicitSourceFilter.isExplicit(extension.name, extension.pkgName))
                 }
                 .flatMap { ext ->
-                    ext.sources.filter { it.lang in enabledLanguages }
+                    ext.sources.filter { it.lang in enabledLanguages && (!filterExplicit || !ExplicitSourceFilter.isExplicit(it.name)) }
                         .map {
                             ext.copy(
                                 name = it.name,
@@ -54,9 +59,13 @@ class GetExtensionsByType(
 
             Extensions(
                 updates = updates,
-                loaded = loaded.sortedWith(compareBy<Extension.Loaded> { !it.isObsolete }.then(byName)),
+                loaded = loaded
+                    .filterNot { filterExplicit && ExplicitSourceFilter.isExplicit(it.name, it.pkgName) }
+                    .sortedWith(compareBy<Extension.Loaded> { !it.isObsolete }.then(byName)),
                 available = available,
-                notLoaded = notLoaded.sortedWith(byName),
+                notLoaded = notLoaded
+                    .filterNot { filterExplicit && ExplicitSourceFilter.isExplicit(it.name, it.pkgName) }
+                    .sortedWith(byName),
             )
         }
     }
