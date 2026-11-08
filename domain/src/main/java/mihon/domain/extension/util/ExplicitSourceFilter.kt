@@ -2,7 +2,8 @@ package mihon.domain.extension.util
 
 object ExplicitSourceFilter {
     private val explicitRegex = Regex(
-        """hentai|porn|porno|coomer|kemono|luscious|fakku|doujindesu|manhwa18|manga18|erocool|\beromanga|\bxxx\b""",
+        """hentai|porn|porno|coomer|kemono|luscious|fakku|""" +
+            """doujindesu|manhwa18|manga18|erocool|\beromanga|\bxxx\b""",
         RegexOption.IGNORE_CASE,
     )
 

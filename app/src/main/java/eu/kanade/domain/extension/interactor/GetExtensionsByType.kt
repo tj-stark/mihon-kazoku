@@ -42,7 +42,10 @@ class GetExtensionsByType(
                         (!filterExplicit || !ExplicitSourceFilter.isExplicit(extension.name, extension.pkgName))
                 }
                 .flatMap { ext ->
-                    ext.sources.filter { it.lang in enabledLanguages && (!filterExplicit || !ExplicitSourceFilter.isExplicit(it.name)) }
+                    ext.sources.filter {
+                        it.lang in enabledLanguages &&
+                            (!filterExplicit || !ExplicitSourceFilter.isExplicit(it.name))
+                    }
                         .map {
                             ext.copy(
                                 name = it.name,
